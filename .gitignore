@@ -22,3 +22,5 @@ server/public/statements/*.pdf
 .DS_Store
 Thumbs.db
 *.log
+
+.vercel
