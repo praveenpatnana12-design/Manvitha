@@ -21,11 +21,13 @@ const publicDir = path.join(__dirname, 'public');
 const invoicesDir = path.join(publicDir, 'invoices');
 const statementsDir = path.join(publicDir, 'statements');
 
-if (!fs.existsSync(invoicesDir)) {
-  fs.mkdirSync(invoicesDir, { recursive: true });
-}
-if (!fs.existsSync(statementsDir)) {
-  fs.mkdirSync(statementsDir, { recursive: true });
+if (!process.env.VERCEL) {
+  if (!fs.existsSync(invoicesDir)) {
+    fs.mkdirSync(invoicesDir, { recursive: true });
+  }
+  if (!fs.existsSync(statementsDir)) {
+    fs.mkdirSync(statementsDir, { recursive: true });
+  }
 }
 
 // Serve public directory statically
@@ -64,10 +66,23 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Serve frontend in production (optional setup)
-app.get('/', (req, res) => {
-  res.json({ message: 'Welcome to Manivtha Tours & Travels Portal API' });
-});
+// Serve frontend built React assets if they exist
+const clientDistPath = path.join(__dirname, '../client/dist');
+if (fs.existsSync(clientDistPath)) {
+  app.use(express.static(clientDistPath));
+  
+  // React Router fallback for deep routing links
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api')) {
+      return next();
+    }
+    res.sendFile(path.join(clientDistPath, 'index.html'));
+  });
+} else {
+  app.get('/', (req, res) => {
+    res.json({ message: 'Welcome to Manivtha Tours & Travels Portal API' });
+  });
+}
 
 // Error handling middleware
 app.use(errorHandler);
