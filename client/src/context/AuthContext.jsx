@@ -3,9 +3,11 @@ import axios from 'axios';
 
 const AuthContext = createContext(null);
 
-// Create custom axios instance with proxy path
+// Create custom axios instance
+// In production: VITE_API_URL points to the deployed backend (e.g. Render)
+// In local dev: empty baseURL uses Vite's proxy config (vite.config.js) to forward /api/* to localhost:5000
 export const api = axios.create({
-  baseURL: '',
+  baseURL: import.meta.env.VITE_API_URL || '',
 });
 
 // Request interceptor to add JWT token
