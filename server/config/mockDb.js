@@ -274,26 +274,43 @@ const getInitialData = () => {
   };
 };
 
+let inMemoryData = null;
+
 // Ensure JSON file exists and load it
 const loadDb = () => {
+  if (inMemoryData) {
+    return inMemoryData;
+  }
+
   if (!fs.existsSync(dbPath)) {
     const initial = getInitialData();
-    fs.writeFileSync(dbPath, JSON.stringify(initial, null, 2), 'utf-8');
+    try {
+      fs.writeFileSync(dbPath, JSON.stringify(initial, null, 2), 'utf-8');
+    } catch (err) {
+      console.warn('WARNING: Failed to initialize mock DB file on disk. Storing in memory fallback.');
+    }
+    inMemoryData = initial;
     return initial;
   }
   try {
     const raw = fs.readFileSync(dbPath, 'utf-8');
-    return JSON.parse(raw);
+    inMemoryData = JSON.parse(raw);
+    return inMemoryData;
   } catch (err) {
     console.error('Error reading mock DB file. Reinitializing...', err);
     const initial = getInitialData();
-    fs.writeFileSync(dbPath, JSON.stringify(initial, null, 2), 'utf-8');
+    inMemoryData = initial;
     return initial;
   }
 };
 
 const saveDb = (data) => {
-  fs.writeFileSync(dbPath, JSON.stringify(data, null, 2), 'utf-8');
+  inMemoryData = data;
+  try {
+    fs.writeFileSync(dbPath, JSON.stringify(data, null, 2), 'utf-8');
+  } catch (err) {
+    console.warn('WARNING: Failed to write to mock_db.json (Read-only filesystem detected). Keeping updates in memory.');
+  }
 };
 
 module.exports = {
