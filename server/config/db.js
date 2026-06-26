@@ -5,15 +5,25 @@ const mockDb = require('./mockDb');
 dotenv.config();
 
 let pool = null;
-let isMock = false;
+let isMock = true;
 
 const testConnection = async () => {
+  const hasDbConfig = process.env.DB_HOST && process.env.DB_USER && process.env.DB_NAME;
+  
+  if (!hasDbConfig) {
+    console.log('Database Connection Status: Running in Mock JSON database mode (No config).');
+    pool = null;
+    isMock = true;
+    mockDb.init();
+    return;
+  }
+
   try {
     pool = mysql.createPool({
-      host: process.env.DB_HOST || 'localhost',
-      user: process.env.DB_USER || 'root',
+      host: process.env.DB_HOST,
+      user: process.env.DB_USER,
       password: process.env.DB_PASSWORD || '',
-      database: process.env.DB_NAME || 'manvitha_billing',
+      database: process.env.DB_NAME,
       port: parseInt(process.env.DB_PORT || '3306'),
       waitForConnections: true,
       connectionLimit: 10,
