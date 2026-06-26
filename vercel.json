@@ -19,16 +19,16 @@
       "dest": "server/server.js"
     },
     {
-      "src": "/assets/(.*)",
-      "dest": "client/assets/$1"
+      "src": "/invoices/(.*)",
+      "dest": "server/server.js"
     },
     {
-      "src": "/(.*)\\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|pdf|csv)",
-      "dest": "client/$1.$2"
+      "src": "/statements/(.*)",
+      "dest": "server/server.js"
     },
     {
       "src": "/(.*)",
-      "dest": "client/index.html"
+      "dest": "client/$1"
     }
   ]
 }
