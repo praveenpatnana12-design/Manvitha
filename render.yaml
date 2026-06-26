@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: manvitha-billing-portal
+    env: node
+    plan: free
+    buildCommand: npm run install-all && npm run build --prefix client
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DB_HOST
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_NAME
+        value: manvitha_billing
+      - key: DB_PORT
+        value: 3306
+      - key: GEMINI_API_KEY
+        sync: false

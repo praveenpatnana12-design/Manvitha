@@ -1,0 +1,24 @@
+# Node dependencies
+node_modules/
+
+# Environment variables
+.env
+.env.local
+
+# Production build outputs
+dist/
+build/
+
+# Local database file
+server/mock_db.json
+
+# Local generated PDFs and static file outputs
+server/public/invoices/*.pdf
+server/public/statements/*.pdf
+
+# IDE/Editor configs
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
