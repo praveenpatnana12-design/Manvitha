@@ -12,12 +12,39 @@ import {
   Clock,
   ArrowRight
 } from 'lucide-react';
-import { Chart as ChartJS, registerables } from 'chart.js';
+import { 
+  Chart as ChartJS, 
+  CategoryScale, 
+  LinearScale, 
+  PointElement, 
+  LineElement, 
+  BarElement, 
+  ArcElement, 
+  Title, 
+  Tooltip, 
+  Legend, 
+  BarController, 
+  LineController, 
+  DoughnutController 
+} from 'chart.js';
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
 import Toast from '../components/Toast';
 
-// Register all ChartJS modules to support mixed line & bar charts
-ChartJS.register(...registerables);
+// Register ChartJS modules explicitly to prevent tree-shaking in production bundles
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend,
+  BarController,
+  LineController,
+  DoughnutController
+);
 
 const Dashboard = () => {
   const { user } = useAuth();
