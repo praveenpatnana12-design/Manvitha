@@ -5,46 +5,47 @@ const mockDb = require('./mockDb');
 dotenv.config();
 
 let pool = null;
-let isMock = true;
+let isMock = false;
 
-const testConnection = async () => {
-  const hasDbConfig = process.env.DB_HOST && process.env.DB_USER && process.env.DB_NAME;
-  
-  if (!hasDbConfig) {
-    console.log('Database Connection Status: Running in Mock JSON database mode (No config).');
-    pool = null;
-    isMock = true;
-    mockDb.init();
-    return;
-  }
+// Synchronous fast-fallback on Vercel or production if DB_HOST environment variable is missing
+const shouldRunMock = (process.env.VERCEL === '1' && !process.env.DB_HOST) || 
+                      (process.env.NODE_ENV === 'production' && !process.env.DB_HOST);
 
-  try {
-    pool = mysql.createPool({
-      host: process.env.DB_HOST,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD || '',
-      database: process.env.DB_NAME,
-      port: parseInt(process.env.DB_PORT || '3306'),
-      waitForConnections: true,
-      connectionLimit: 10,
-      queueLimit: 0
-    });
-    
-    // Test the connection
-    const connection = await pool.getConnection();
-    console.log('MySQL Database connected successfully.');
-    connection.release();
-    isMock = false;
-  } catch (error) {
-    console.log('Database Connection Status: Running in Mock JSON database mode.');
-    pool = null;
-    isMock = true;
-    mockDb.init();
-  }
-};
+if (shouldRunMock) {
+  console.log('Database Connection Status: Vercel/Production environment with no DB_HOST. Running in Mock JSON database mode.');
+  pool = null;
+  isMock = true;
+  mockDb.init();
+} else {
+  const testConnection = async () => {
+    try {
+      pool = mysql.createPool({
+        host: process.env.DB_HOST || 'localhost',
+        user: process.env.DB_USER || 'root',
+        password: process.env.DB_PASSWORD || '',
+        database: process.env.DB_NAME || 'manvitha_billing',
+        port: parseInt(process.env.DB_PORT || '3306'),
+        waitForConnections: true,
+        connectionLimit: 10,
+        queueLimit: 0
+      });
+      
+      // Test the connection
+      const connection = await pool.getConnection();
+      console.log('MySQL Database connected successfully.');
+      connection.release();
+      isMock = false;
+    } catch (error) {
+      console.log('Database Connection Status: MySQL connect failed. Running in Mock JSON database mode.');
+      pool = null;
+      isMock = true;
+      mockDb.init();
+    }
+  };
 
-// Immediately invoke connection test
-testConnection();
+  // Immediately invoke connection test
+  testConnection();
+}
 
 module.exports = {
   getPool: () => pool,
