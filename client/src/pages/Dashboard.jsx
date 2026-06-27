@@ -12,22 +12,12 @@ import {
   Clock,
   ArrowRight
 } from 'lucide-react';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, ArcElement } from 'chart.js';
+import { Chart as ChartJS, registerables } from 'chart.js';
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
 import Toast from '../components/Toast';
 
-// Register ChartJS modules
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  ArcElement,
-  Title,
-  Tooltip,
-  Legend
-);
+// Register all ChartJS modules to support mixed line & bar charts
+ChartJS.register(...registerables);
 
 const Dashboard = () => {
   const { user } = useAuth();
